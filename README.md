@@ -31,16 +31,10 @@ MotherCare Smart Reminder System is an IoT-based healthcare support system that 
 
 **For Software:**
 - Languages used: html
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit
+- Frameworks used: Html
+- Libraries used: FullCalendar,dayjs / date-fns,Bootstrap or Tailwind 
 - Tools used: VS Code, Github
 
-**For Hardware:**
-- Main components: [List main components]
-- Specifications: [Technical specifications]
-- Tools required: [List tools needed]
-
----
 
 ## Features
 
@@ -53,8 +47,17 @@ List the key features of your project:
 ---
 
 ## Implementation
+Here is the **short implementation (points)**
 
-### For Software:
+1. Developed using **HTML, CSS, and JavaScript** in VS Code.
+2. Created login page to collect user details (name, age, pregnancy month, height, weight).
+3. Used JavaScript to validate input and show dashboard after login.
+4. Displayed month-based food recommendations using conditional logic.
+5. Added medicine and vaccination reminder section.
+6. Implemented manual to-do list feature.
+7. Tested using Live Server and uploaded to GitHub.
+
+
 
 #### Installation
 ```bash
@@ -66,13 +69,6 @@ List the key features of your project:
 [Run commands - e.g., npm start, python app.py]
 ```
 
-### For Hardware:
-
-#### Components Required
-[List all components needed with specifications]
-
-#### Circuit Setup
-[Explain how to set up the circuit]
 
 ---
 
@@ -81,15 +77,8 @@ List the key features of your project:
 ### For Software:
 
 #### Screenshots (Add at least 3)
-
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/file/d/1za7nm8wXGYD5CB2OKiM_YFWmPQ5Kqsvc/view?usp=drive_link
+https://drive.google.com/file/d/1CQ_A32J9Gvqt6VcYfQxB0C_jEcxQ9kOA/view?usp=drive_link
 
 #### Diagrams
 
@@ -102,31 +91,6 @@ List the key features of your project:
 
 ![Workflow](docs/workflow.png)
 *Add caption explaining your workflow*
-
----
-
-### For Hardware:
-
-#### Schematic & Circuit
-
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-#### Build Photos
-
-![Team](Add photo of your team here)
-
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
 
 ---
 
