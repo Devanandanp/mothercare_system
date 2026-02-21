@@ -2,27 +2,26 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [Project Name] 🎯
+# Mother care system 🎯
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: Herlytics
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
+- Member 1: Devananda N P - SNM Institute of management and technology
+- Member 2: Arya N S - SNM Institute of management and technology
 
 ### Hosted Project Link
-[mention your project hosted link here]
+
 
 ### Project Description
-[2-3 lines about what your project does]
-
+MotherCare Smart Reminder System is a web-based application designed to support pregnant women in maintaining a healthy daily routine. The system allows users to log in using their email or phone number and enter personal details such as name, age, pregnancy month, height, and weight. Based on the pregnancy month, it provides personalized guidance for food, medicines, vaccinations, and regular checkups. It also includes a manual to-do list feature to track important tasks and appointments. The main aim of this project is to improve maternal health awareness and ensure proper prenatal care through a simple and user-friendly interface
 ### The Problem statement
-[What problem are you solving?]
+many rural pregnent women miss nutrition,guidance vaccination
 
 ### The Solution
-[How are you solving it?]
+MotherCare Smart Reminder System is an IoT-based healthcare support system that sends automated SMS alerts and emergency notifications to pregnant women and caregivers.
 
 ---
 
@@ -31,10 +30,10 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
+- Languages used: html
 - Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Libraries used: [e.g., axios, pandas, JUnit
+- Tools used: VS Code, Github
 
 **For Hardware:**
 - Main components: [List main components]
@@ -46,10 +45,10 @@
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: secure login & profile tracking
+- Feature 2: pesonalized daily routine dashboard
+- Feature 3: smart reminder system
+- Feature 4: manual to do list management
 
 ---
 
