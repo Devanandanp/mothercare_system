@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotherCare Smart Reminder</title>
+    <style>
+        :root{--accent:#6a0572;--muted:#7a7a7a;--bg:linear-gradient(135deg,#fbd3e9,#bbd2c5);}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:Segoe UI, Roboto, Arial; background:var(--bg); color:#222}
+        .app{max-width:1000px;margin:30px auto;padding:20px}
+        .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+        .login-wrap{max-width:520px;margin:40px auto}
+        h1,h2,h3{margin:6px 0}
+        .grid{display:grid;grid-template-columns:280px 1fr;gap:18px}
+        .center{display:flex;flex-direction:column;align-items:stretch}
+        input,select,textarea,button{font-size:15px}
+        input,select,textarea{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #e0e0e0}
+        button{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer}
+        .muted{color:var(--muted);font-size:13px}
+        .week{display:flex;gap:6px;margin-bottom:10px}
+        .day{flex:1;padding:8px;border-radius:8px;text-align:center;cursor:pointer}
+        .day.active{background:linear-gradient(90deg,#ffd6e8,#d4f0e0);font-weight:600}
+        .section{margin-top:12px}
+        .item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:#fafafa;margin-bottom:8px}
+        .item .meta{color:var(--muted);font-size:13px}
+        .small{font-size:13px;padding:6px 8px}
+        .flex{display:flex;gap:8px}
+        .pill{background:#f1f1f1;padding:6px 8px;border-radius:999px;font-size:13px}
+        .right{margin-left:auto}
+        .todo-done{text-decoration:line-through;color:#999}
+        .controls{display:flex;gap:8px}
+        @media(max-width:820px){.grid{grid-template-columns:1fr;}.week{overflow:auto}}
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div id="loginPage" class="login-wrap card">
+            <h1>🍼 MotherCare Onboarding</h1>
+            <p class="muted">Sign in with Email or Phone — we'll personalize your daily routine.</p>
+            <div>
+                <input id="emailPhone" placeholder="Email or Phone">
+                <input id="name" placeholder="Full name">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <input id="age" type="number" placeholder="Age">
+                    <input id="month" type="number" placeholder="Pregnancy month (1-9)">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <input id="height" type="number" placeholder="Height (cm)">
+                    <input id="weight" type="number" placeholder="Weight (kg)">
+                </div>
+                <div class="controls">
+                    <button onclick="login()">Continue</button>
+                    <button onclick="fillDemo()" style="background:#aaa">Demo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <div class="grid">
+                <div class="card">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div>
+                            <h2 id="userName">Hello</h2>
+                            <div class="muted" id="userMeta"></div>
+                        </div>
+                        <div class="right">
+                            <button onclick="logout()" style="background:#e05c8a">Logout</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="muted">This Week</div>
+                        <div id="week" class="week"></div>
+                    </div>
+
+                    <div class="section">
+                        <div class="muted">Quick Actions</div>
+                        <div style="display:flex;gap:8px;margin-top:8px">
+                            <button onclick="addMedicationPrompt()" class="small">+ Add Medicine</button>
+                            <button onclick="addTodoPrompt()" class="small">+ New To-Do</button>
+                            <button onclick="addManualRoutinePrompt()" class="small">+ Manual Entry</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <h2 id="dateTitle">Today</h2>
+                            <div class="muted" id="dateSub"></div>
+                        </div>
+
+                        <div id="content">
+                            <div class="section">
+                                <h3>🥗 Meals</h3>
+                                <div id="meals"></div>
+                            </div>
+
+                            <div class="section">
+                                <h3>💊 Medicines</h3>
+                                <div id="meds"></div>
+                            </div>
+
+                            <div class="section">
+                                <h3>💉 Vaccination / Checkup</h3>
+                                <div id="checks"></div>
+                            </div>
+
+                            <div class="section">
+                                <h3>📝 To-Do</h3>
+                                <div style="display:flex;gap:8px;margin-bottom:8px">
+                                    <input id="newTodo" placeholder="New task">
+                                    <button onclick="addTaskFromInput()">Add</button>
+                                </div>
+                                <div id="todos"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple persistence keys
+        const KEY_PROFILE = 'mc_profile';
+        const KEY_TODOS = 'mc_todos';
+        const KEY_MEDS = 'mc_meds';
+        const KEY_MANUAL = 'mc_manual';
+
+        let profile = null;
+        let selectedDate = new Date();
+
+        function init(){
+            const p = localStorage.getItem(KEY_PROFILE);
+            if(p){
+                profile = JSON.parse(p);
+                showDashboard();
+            }
+        }
+
+        function login(){
+            const emailPhone = document.getElementById('emailPhone').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const age = parseInt(document.getElementById('age').value)||0;
+            const month = parseInt(document.getElementById('month').value)||0;
+            const height = parseFloat(document.getElementById('height').value)||0;
+            const weight = parseFloat(document.getElementById('weight').value)||0;
+
+            if(!emailPhone || !name || month<1){ alert('Please provide email/phone, name and pregnancy month.'); return; }
+
+            profile = {emailPhone,name,age,month,height,weight};
+            localStorage.setItem(KEY_PROFILE, JSON.stringify(profile));
+            showDashboard();
+        }
+
+        function fillDemo(){
+            document.getElementById('emailPhone').value='demo@example.com';
+            document.getElementById('name').value='Asha';
+            document.getElementById('age').value='28';
+            document.getElementById('month').value='5';
+            document.getElementById('height').value='160';
+            document.getElementById('weight').value='60';
+        }
+
+        function logout(){
+            // keep data but remove profile to simulate logout
+            localStorage.removeItem(KEY_PROFILE);
+            location.reload();
+        }
+
+        function showDashboard(){
+            document.getElementById('loginPage').style.display='none';
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('userName').innerText = profile.name + ' 💖';
+            document.getElementById('userMeta').innerText = 'Pregnancy month: ' + profile.month + ' · ' + (profile.age? profile.age+' yrs':'' );
+            buildWeek();
+            renderForDate(selectedDate);
+        }
+
+        function buildWeek(){
+            const week = document.getElementById('week'); week.innerHTML='';
+            const start = new Date(); // current week
+            start.setDate(start.getDate() - start.getDay()); // Sunday
+            for(let i=0;i<7;i++){
+                const d = new Date(start); d.setDate(start.getDate()+i);
+                const btn = document.createElement('div');
+                btn.className='day' + (isSameDay(d, selectedDate)? ' active':'');
+                btn.innerHTML = `<div>${d.toLocaleString(undefined,{weekday:'short'})}</div><div class="muted">${d.getDate()}/${d.getMonth()+1}</div>`;
+                btn.onclick = ()=>{ selectedDate = d; document.querySelectorAll('.day').forEach(el=>el.classList.remove('active')); btn.classList.add('active'); renderForDate(d); }
+                week.appendChild(btn);
+            }
+        }
+
+        function isSameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+        function renderForDate(d){
+            document.getElementById('dateTitle').innerText = d.toLocaleDateString(undefined,{weekday:'long'});
+            document.getElementById('dateSub').innerText = d.toLocaleDateString();
+            renderMeals(d);
+            renderMeds(d);
+            renderChecks(d);
+            renderTodos(d);
+        }
+
+        function getKeyForDate(prefix,date){ const y=date.getFullYear(),m=date.getMonth()+1,dd=date.getDate(); return `${prefix}_${y}-${m}-${dd}` }
+
+        function renderMeals(d){
+            const container = document.getElementById('meals'); container.innerHTML='';
+            const month = profile.month;
+            const meals = generateMealsForMonth(month);
+            meals.forEach(m=>{
+                const div = document.createElement('div'); div.className='item';
+                div.innerHTML = `<div><strong>${m.name}</strong><div class="meta">${m.desc}</div></div><div class="pill">${m.qty}</div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function generateMealsForMonth(month){
+            // Simple rules for quantity guidance
+            if(month<=3) return [
+                {name:'Breakfast',qty:'1 glass milk, 1 fruit',desc:'Light breakfast with folate-rich foods'},
+                {name:'Lunch',qty:'Moderate portions',desc:'Include proteins and veg'},
+                {name:'Dinner',qty:'Light meal',desc:'Easily digestible foods'},
+                {name:'Snacks',qty:'2 small snacks',desc:'Nuts or yogurt'}
+            ];
+            if(month<=6) return [
+                {name:'Breakfast',qty:'1 bowl porridge, 1 fruit',desc:'Higher protein & iron'},
+                {name:'Lunch',qty:'Full plate with protein',desc:'Include pulses/meat/fish'},
+                {name:'Dinner',qty:'Moderate with veg',desc:'Avoid heavy fried foods'},
+                {name:'Snacks',qty:'2-3 small snacks',desc:'Dry fruits, milk'}
+            ];
+            return [
+                {name:'Breakfast',qty:'1 bowl + milk',desc:'Focus on calcium & protein'},
+                {name:'Lunch',qty:'Slightly smaller portions',desc:'Frequent small meals advised'},
+                {name:'Dinner',qty:'Light + protein',desc:'Avoid late heavy meals'},
+                {name:'Snacks',qty:'3 small snacks',desc:'Rich in nutrients'}
+            ];
+        }
+
+        function renderMeds(d){
+            const key = getKeyForDate(KEY_MEDS,d);
+            let meds = JSON.parse(localStorage.getItem(key) || 'null');
+            if(!meds){ // use defaults
+                meds = [
+                    {name:'Iron tablet',time:'08:00',dose:'1 tablet',taken:false},
+                    {name:'Folic Acid',time:'20:00',dose:'1 tablet',taken:false}
+                ];
+            }
+            localStorage.setItem(key, JSON.stringify(meds));
+            const container = document.getElementById('meds'); container.innerHTML='';
+            meds.forEach((m,i)=>{
+                const it = document.createElement('div'); it.className='item';
+                it.innerHTML = `<div><strong>${m.name}</strong><div class="meta">${m.dose} · ${m.time}</div></div>`;
+                const btns = document.createElement('div');
+                const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = m.taken; chk.onchange = ()=>{ meds[i].taken = chk.checked; localStorage.setItem(key,JSON.stringify(meds)); renderMeds(d); }
+                btns.appendChild(chk);
+                const del = document.createElement('button'); del.className='small'; del.style.background='#eee'; del.style.color='#333'; del.innerText='Delete'; del.onclick=()=>{ meds.splice(i,1); localStorage.setItem(key,JSON.stringify(meds)); renderMeds(d); }
+                btns.appendChild(del);
+                it.appendChild(btns);
+                container.appendChild(it);
+            });
+        }
+
+        function addMedicationPrompt(){
+            const name = prompt('Medicine name'); if(!name) return;
+            const dose = prompt('Dose (e.g., 1 tablet)') || '';
+            const time = prompt('Time (HH:MM)') || '08:00';
+            const key = getKeyForDate(KEY_MEDS, selectedDate);
+            const meds = JSON.parse(localStorage.getItem(key) || '[]');
+            meds.push({name,dose,time,taken:false});
+            localStorage.setItem(key, JSON.stringify(meds)); renderMeds(selectedDate);
+        }
+
+        function renderChecks(d){
+            const container = document.getElementById('checks'); container.innerHTML='';
+            const items = [
+                {name:'Monthly Doctor Checkup',due:true},
+                {name:'TT Injection (if due)',due:false}
+            ];
+            items.forEach((it,i)=>{
+                const el = document.createElement('div'); el.className='item';
+                el.innerHTML = `<div><strong>${it.name}</strong><div class="meta">${it.due? 'Due':'As scheduled'}</div></div>`;
+                const btn = document.createElement('button'); btn.className='small'; btn.innerText='Done'; btn.onclick=()=>{ alert('Marked done'); }
+                el.appendChild(btn);
+                container.appendChild(el);
+            });
+        }
+
+        function renderTodos(d){
+            const key = getKeyForDate(KEY_TODOS,d);
+            const todos = JSON.parse(localStorage.getItem(key) || '[]');
+            const container = document.getElementById('todos'); container.innerHTML='';
+            todos.forEach((t,i)=>{
+                const el = document.createElement('div'); el.className='item';
+                el.innerHTML = `<div><div class="${t.done? 'todo-done':''}">${t.text}</div><div class="meta">${t.note||''}</div></div>`;
+                const btns = document.createElement('div');
+                const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = t.done; chk.onchange = ()=>{ todos[i].done = chk.checked; localStorage.setItem(key,JSON.stringify(todos)); renderTodos(d); }
+                btns.appendChild(chk);
+                const del = document.createElement('button'); del.className='small'; del.style.background='#eee'; del.style.color='#333'; del.innerText='Delete'; del.onclick=()=>{ todos.splice(i,1); localStorage.setItem(key,JSON.stringify(todos)); renderTodos(d); }
+                btns.appendChild(del);
+                el.appendChild(btns);
+                container.appendChild(el);
+            });
+        }
+
+        function addTaskFromInput(){
+            const txt = document.getElementById('newTodo').value.trim(); if(!txt) return; const key = getKeyForDate(KEY_TODOS, selectedDate);
+            const arr = JSON.parse(localStorage.getItem(key) || '[]'); arr.push({text:txt,done:false}); localStorage.setItem(key,JSON.stringify(arr)); document.getElementById('newTodo').value=''; renderTodos(selectedDate);
+        }
+
+        function addTodoPrompt(){ const t = prompt('Task'); if(!t) return; const key = getKeyForDate(KEY_TODOS, selectedDate); const arr = JSON.parse(localStorage.getItem(key)||'[]'); arr.push({text:t,done:false}); localStorage.setItem(key,JSON.stringify(arr)); renderTodos(selectedDate); }
+
+        function addManualRoutinePrompt(){ const text = prompt('Manual entry (e.g., Yoga - 30 mins)'); if(!text) return; const key = getKeyForDate(KEY_MANUAL, selectedDate); const arr = JSON.parse(localStorage.getItem(key)||'[]'); arr.push({text}); localStorage.setItem(key,JSON.stringify(arr)); alert('Added manual entry to this day'); }
+
+        init();
+    </script>
+</body>
+</html>
