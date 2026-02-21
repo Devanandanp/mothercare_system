@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotherCare Smart Reminder</title>
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#fbd3e9,#bbd2c5);
+}
+
+.container{
+    width:90%;
+    max-width:500px;
+    margin:40px auto;
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+h2{
+    text-align:center;
+    color:#6a0572;
+}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#6a0572;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#a4508b;
+}
+
+.hidden{
+    display:none;
+}
+
+.card{
+    background:#f7f7f7;
+    padding:15px;
+    border-radius:15px;
+    margin-top:15px;
+}
+
+ul{
+    padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="loginPage">
+    <h2>🍼 MotherCare Login</h2>
+    <input type="text" id="emailPhone" placeholder="Email or Phone Number" required>
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="age" placeholder="Age">
+    <input type="number" id="month" placeholder="Pregnancy Month (1-9)">
+    <input type="number" id="height" placeholder="Height (cm)">
+    <input type="number" id="weight" placeholder="Weight (kg)">
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="container hidden" id="dashboard">
+    <h2>🌸 Daily MotherCare Routine</h2>
+    <p id="welcome"></p>
+
+    <div class="card">
+        <h3>🥗 Food Routine</h3>
+        <ul id="foodList"></ul>
+    </div>
+
+    <div class="card">
+        <h3>💊 Medicine</h3>
+        <ul>
+            <li>Iron tablet</li>
+            <li>Folic Acid</li>
+            <li>Calcium</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>💉 Vaccination / Checkup</h3>
+        <ul>
+            <li>TT Injection (As scheduled)</li>
+            <li>Monthly Doctor Checkup</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>📝 To-Do List</h3>
+        <input type="text" id="todoInput" placeholder="Enter task">
+        <button onclick="addTask()">Add Task</button>
+        <ul id="todoList"></ul>
+    </div>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+function login(){
+    let name = document.getElementById("name").value;
+    let month = document.getElementById("month").value;
+
+    if(name === "" || month === ""){
+        alert("Please fill required details!");
+        return;
+    }
+
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+
+    document.getElementById("welcome").innerText = 
+        "Welcome " + name + " 💖 | Pregnancy Month: " + month;
+
+    showFoodRoutine(month);
+}
+
+function showFoodRoutine(month){
+    let food = document.getElementById("foodList");
+    food.innerHTML="";
+
+    if(month <= 3){
+        food.innerHTML += "<li>Milk & Fruits</li>";
+        food.innerHTML += "<li>Folic acid rich foods</li>";
+    }
+    else if(month <= 6){
+        food.innerHTML += "<li>Protein rich diet</li>";
+        food.innerHTML += "<li>Green leafy vegetables</li>";
+    }
+    else{
+        food.innerHTML += "<li>Calcium rich foods</li>";
+        food.innerHTML += "<li>Dry fruits</li>";
+    }
+}
+
+function addTask(){
+    let task = document.getElementById("todoInput").value;
+    if(task === "") return;
+
+    let li = document.createElement("li");
+    li.innerText = task;
+    document.getElementById("todoList").appendChild(li);
+    document.getElementById("todoInput").value="";
+}
+
+function logout(){
+    location.reload();
+}
+</script>
+
+</body>
+</html>
